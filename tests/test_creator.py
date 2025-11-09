@@ -149,17 +149,29 @@ class TestCreator:
 
     def test_create_batch_template_missing(self, temp_workspace):
         """Test creating batch when template is missing"""
+        from aiwynns.exceptions import TemplateNotFoundError
+
         creator = Creator(temp_workspace)
 
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(TemplateNotFoundError) as exc_info:
             creator.create_batch("Fantasy", "magic", "Test", 10)
+
+        # Verify error message is informative
+        assert "concept-batch.md" in str(exc_info.value)
+        assert "not found" in str(exc_info.value)
 
     def test_create_story_template_missing(self, temp_workspace):
         """Test creating story when template is missing"""
+        from aiwynns.exceptions import TemplateNotFoundError
+
         creator = Creator(temp_workspace)
 
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(TemplateNotFoundError) as exc_info:
             creator.create_story("Test", "Fantasy")
+
+        # Verify error message is informative
+        assert "story-development.md" in str(exc_info.value)
+        assert "not found" in str(exc_info.value)
 
     def test_create_batch_with_special_characters(self, temp_workspace, mock_templates):
         """Test creating batch with special characters in metadata"""

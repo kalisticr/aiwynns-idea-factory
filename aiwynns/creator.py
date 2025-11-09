@@ -9,8 +9,14 @@ import logging
 from .validation import (
     validate_string,
     validate_integer,
-    validate_slug,
-    ValidationError
+    validate_slug
+)
+from .exceptions import (
+    ValidationError,
+    TemplateNotFoundError,
+    FileReadError,
+    FileWriteError,
+    CreationError
 )
 
 logger = logging.getLogger(__name__)
@@ -68,9 +74,17 @@ class Creator:
 
         # Read template
         template_file = self.templates_dir / "concept-batch.md"
+        if not template_file.exists():
+            logger.error(f"Template not found: {template_file}")
+            raise TemplateNotFoundError("concept-batch.md", str(self.templates_dir))
+
         logger.debug(f"Reading template: {template_file}")
-        with open(template_file, 'r') as f:
-            content = f.read()
+        try:
+            with open(template_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+        except (OSError, IOError, PermissionError) as e:
+            logger.error(f"Failed to read template {template_file}: {e}")
+            raise FileReadError(str(template_file), str(e))
 
         # Replace placeholders
         content = content.replace("YYYYMMDD-001", batch_id)
@@ -80,10 +94,17 @@ class Creator:
         content = content.replace("count: 10", f"count: {count}")
         content = content.replace('"model used"', f'"{model}"')
 
+        # Ensure directory exists
+        self.concepts_dir.mkdir(parents=True, exist_ok=True)
+
         # Write file
         logger.debug(f"Writing batch file: {new_file}")
-        with open(new_file, 'w') as f:
-            f.write(content)
+        try:
+            with open(new_file, 'w', encoding='utf-8') as f:
+                f.write(content)
+        except (OSError, IOError, PermissionError) as e:
+            logger.error(f"Failed to write batch file {new_file}: {e}")
+            raise FileWriteError(str(new_file), str(e))
 
         logger.info(f"Created batch: {batch_id} at {new_file}")
         return new_file
@@ -138,9 +159,17 @@ class Creator:
 
         # Read template
         template_file = self.templates_dir / "story-development.md"
+        if not template_file.exists():
+            logger.error(f"Template not found: {template_file}")
+            raise TemplateNotFoundError("story-development.md", str(self.templates_dir))
+
         logger.debug(f"Reading template: {template_file}")
-        with open(template_file, 'r') as f:
-            content = f.read()
+        try:
+            with open(template_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+        except (OSError, IOError, PermissionError) as e:
+            logger.error(f"Failed to read template {template_file}: {e}")
+            raise FileReadError(str(template_file), str(e))
 
         # Replace placeholders
         content = content.replace("[unique-id]", story_id)
@@ -153,10 +182,17 @@ class Creator:
         )
         content = content.replace("YYYY-MM-DD", datetime.now().strftime("%Y-%m-%d"))
 
+        # Ensure directory exists
+        self.stories_dir.mkdir(parents=True, exist_ok=True)
+
         # Write file
         logger.debug(f"Writing story file: {new_file}")
-        with open(new_file, 'w') as f:
-            f.write(content)
+        try:
+            with open(new_file, 'w', encoding='utf-8') as f:
+                f.write(content)
+        except (OSError, IOError, PermissionError) as e:
+            logger.error(f"Failed to write story file {new_file}: {e}")
+            raise FileWriteError(str(new_file), str(e))
 
         logger.info(f"Created story: {filename} at {new_file}")
         return new_file

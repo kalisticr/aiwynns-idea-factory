@@ -7,7 +7,13 @@ from typing import List, Dict, Optional
 import frontmatter
 import yaml
 import logging
-from .validation import validate_batch_id, ValidationError
+from .validation import validate_batch_id
+from .exceptions import (
+    ValidationError,
+    InvalidFrontmatterError,
+    FileReadError,
+    BatchNotFoundError
+)
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +78,12 @@ class ConceptDatabase:
         return stories
 
     def _parse_batch_file(self, file_path: Path) -> Optional[Dict]:
-        """Parse a batch markdown file with frontmatter"""
+        """
+        Parse a batch markdown file with frontmatter
+
+        Returns None on parsing errors (logged but not raised) to allow
+        graceful degradation when scanning multiple files.
+        """
         try:
             logger.debug(f"Parsing batch file: {file_path}")
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -89,12 +100,24 @@ class ConceptDatabase:
 
             return metadata
 
+        except (OSError, IOError, PermissionError) as e:
+            logger.error(f"Error reading {file_path}: {e}", exc_info=True)
+            return None
+        except yaml.YAMLError as e:
+            logger.error(f"Invalid YAML frontmatter in {file_path}: {e}", exc_info=True)
+            return None
         except Exception as e:
-            logger.error(f"Error parsing {file_path}: {e}", exc_info=True)
+            # Catch-all for unexpected errors
+            logger.error(f"Unexpected error parsing {file_path}: {e}", exc_info=True)
             return None
 
     def _parse_story_file(self, file_path: Path) -> Optional[Dict]:
-        """Parse a story development markdown file"""
+        """
+        Parse a story development markdown file
+
+        Returns None on parsing errors (logged but not raised) to allow
+        graceful degradation when scanning multiple files.
+        """
         try:
             logger.debug(f"Parsing story file: {file_path}")
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -107,8 +130,15 @@ class ConceptDatabase:
 
             return metadata
 
+        except (OSError, IOError, PermissionError) as e:
+            logger.error(f"Error reading {file_path}: {e}", exc_info=True)
+            return None
+        except yaml.YAMLError as e:
+            logger.error(f"Invalid YAML frontmatter in {file_path}: {e}", exc_info=True)
+            return None
         except Exception as e:
-            logger.error(f"Error parsing {file_path}: {e}", exc_info=True)
+            # Catch-all for unexpected errors
+            logger.error(f"Unexpected error parsing {file_path}: {e}", exc_info=True)
             return None
 
     def _extract_concepts_from_content(self, content: str) -> List[Dict]:

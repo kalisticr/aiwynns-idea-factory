@@ -4,11 +4,7 @@ Input validation utilities for the Idea Factory
 
 import re
 from typing import Optional
-
-
-class ValidationError(Exception):
-    """Raised when input validation fails"""
-    pass
+from .exceptions import ValidationError
 
 
 def validate_string(

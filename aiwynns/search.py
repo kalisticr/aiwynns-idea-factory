@@ -8,9 +8,9 @@ from rapidfuzz import fuzz, process
 from .validation import (
     sanitize_search_query,
     validate_limit,
-    validate_string,
-    ValidationError
+    validate_string
 )
+from .exceptions import ValidationError, SearchError
 
 logger = logging.getLogger(__name__)
 
