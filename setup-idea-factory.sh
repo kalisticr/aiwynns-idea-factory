@@ -53,14 +53,6 @@ curl -sL "${TEMPLATES_URL}/concept-batch.md" -o templates/concept-batch.md
 
 echo "✓ Downloaded templates"
 
-# Download resources
-echo "Downloading resources..."
-RESOURCES_URL="https://raw.githubusercontent.com/kalisticr/aiwynns-idea-factory/master/resources"
-
-curl -sL "${RESOURCES_URL}/romantasy-tropes.md" -o resources/romantasy-tropes.md
-
-echo "✓ Downloaded resources"
-
 # Create .gitignore for content workspace
 cat > .gitignore << 'EOF'
 # Python
