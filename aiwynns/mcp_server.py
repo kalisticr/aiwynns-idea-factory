@@ -132,7 +132,16 @@ def list_stories() -> str:
     }
 
     for story in stories:
+        # Extract story name (filename without .md) for use with other tools
+        file_path = story.get("file_path", "")
+        if file_path:
+            from pathlib import Path
+            story_name = Path(file_path).stem
+        else:
+            story_name = None
+
         result["stories"].append({
+            "story_name": story_name,  # Use this with add_note and other tools
             "story_id": story.get("story_id"),
             "title": story.get("title"),
             "genre": story.get("genre"),
@@ -562,7 +571,16 @@ def list_stories_tool(
         }
 
         for story in stories:
+            # Extract story name (filename without .md) for use with other tools
+            file_path = story.get("file_path", "")
+            if file_path:
+                from pathlib import Path
+                story_name = Path(file_path).stem
+            else:
+                story_name = None
+
             result["stories"].append({
+                "story_name": story_name,  # Use this with add_note and other tools
                 "story_id": story.get("story_id"),
                 "title": story.get("title"),
                 "genre": story.get("genre"),

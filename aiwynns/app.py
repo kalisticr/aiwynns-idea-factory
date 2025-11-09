@@ -132,25 +132,33 @@ def list_stories(status, genre, sort):
 
     # Create table
     table = Table(title="📖 Stories in Development", box=box.ROUNDED)
-    table.add_column("Title", style="cyan")
+    table.add_column("Story Name", style="cyan", no_wrap=True)
+    table.add_column("Title", style="bold")
     table.add_column("Genre", style="magenta")
     table.add_column("Status", style="blue")
-    table.add_column("Origin", style="dim")
     table.add_column("Created", style="green")
     table.add_column("Updated", style="yellow")
 
     for story in stories:
+        # Extract story name (filename without .md) from file_path
+        file_path = story.get('file_path', '')
+        if file_path:
+            story_name = Path(file_path).stem  # Gets filename without extension
+        else:
+            story_name = 'N/A'
+
         table.add_row(
+            story_name,
             str(story.get('title', 'N/A')),
             str(story.get('genre', 'N/A')),
             str(story.get('status', 'N/A')),
-            str(story.get('origin_batch', 'manual'))[:15],
             str(story.get('date_created', 'N/A')),
             str(story.get('date_updated', 'N/A'))
         )
 
     console.print(table)
     console.print(f"\n[dim]Total: {len(stories)} stories[/dim]")
+    console.print(f"[dim]Use: idea-factory review-story <story-name>[/dim]")
 
 
 @cli.command()

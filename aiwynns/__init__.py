@@ -3,7 +3,7 @@ Aiwynn's Idea Factory
 A sophisticated system for managing AI-generated fiction novel ideas
 """
 
-__version__ = "1.0.0"
+__version__ = "1.2.1"
 __author__ = "Aiwynn"
 
 from .database import ConceptDatabase
