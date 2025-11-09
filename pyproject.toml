@@ -1,6 +1,6 @@
 [project]
 name = "aiwynns-idea-factory"
-version = "1.0.2"
+version = "1.1.0"
 description = "A sophisticated system for managing AI-generated fiction novel ideas"
 requires-python = ">=3.12"
 dependencies = [

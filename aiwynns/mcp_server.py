@@ -479,6 +479,101 @@ def update_index() -> str:
         })
 
 
+@mcp.tool()
+def list_batches_tool(
+    status: Optional[str] = None,
+    genre: Optional[str] = None
+) -> str:
+    """
+    List all concept batches with optional filtering
+
+    Args:
+        status: Optional status filter (e.g., "generated", "developing")
+        genre: Optional genre filter (e.g., "Romantasy", "Fantasy")
+    """
+    try:
+        batches = db.get_all_batches()
+
+        # Apply filters
+        if status:
+            batches = [b for b in batches if b.get('status') == status]
+        if genre:
+            batches = [b for b in batches if genre.lower() in str(b.get('genre', '')).lower()]
+
+        result = {
+            "success": True,
+            "total": len(batches),
+            "batches": []
+        }
+
+        for batch in batches:
+            result["batches"].append({
+                "batch_id": batch.get("batch_id"),
+                "date": batch.get("date_generated"),
+                "genre": batch.get("genre"),
+                "tropes": batch.get("tropes"),
+                "count": batch.get("count"),
+                "status": batch.get("status"),
+                "location": batch.get("location")
+            })
+
+        return json.dumps(serialize_for_json(result), indent=2)
+
+    except Exception as e:
+        return json.dumps({
+            "success": False,
+            "error": str(e)
+        })
+
+
+@mcp.tool()
+def list_stories_tool(
+    status: Optional[str] = None,
+    genre: Optional[str] = None
+) -> str:
+    """
+    List all stories in development with optional filtering
+
+    Args:
+        status: Optional status filter (e.g., "developing", "draft", "complete")
+        genre: Optional genre filter (e.g., "Romantasy", "Fantasy")
+    """
+    try:
+        stories = db.get_all_stories()
+
+        # Apply filters
+        if status:
+            stories = [s for s in stories if s.get('status') == status]
+        if genre:
+            stories = [s for s in stories if genre.lower() in str(s.get('genre', '')).lower()]
+
+        result = {
+            "success": True,
+            "total": len(stories),
+            "stories": []
+        }
+
+        for story in stories:
+            result["stories"].append({
+                "story_id": story.get("story_id"),
+                "title": story.get("title"),
+                "genre": story.get("genre"),
+                "status": story.get("status"),
+                "origin_batch": story.get("origin_batch"),
+                "date_created": story.get("date_created"),
+                "date_updated": story.get("date_updated"),
+                "file_path": story.get("file_path")
+            })
+
+        return json.dumps(serialize_for_json(result), indent=2)
+
+    except Exception as e:
+        return json.dumps({
+            "success": False,
+            "error": str(e)
+        })
+
+
 # ============================================================================
 # PROMPTS - Reusable templates
 # ============================================================================
