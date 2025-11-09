@@ -7,6 +7,7 @@ A sophisticated tool for managing AI-generated story concepts
 import os
 import sys
 from pathlib import Path
+from importlib.metadata import version
 
 import click
 from rich.console import Console
@@ -35,7 +36,7 @@ db = ConceptDatabase(PROJECT_ROOT)
 
 
 @click.group()
-@click.version_option(version="1.0.0")
+@click.version_option(version=version("aiwynns-idea-factory"))
 def cli():
     """
     Aiwynn's Idea Factory - Manage your story concepts with style!
