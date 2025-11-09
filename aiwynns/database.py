@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 import frontmatter
 import yaml
+from .validation import validate_batch_id, ValidationError
 
 
 class ConceptDatabase:
@@ -32,7 +33,21 @@ class ConceptDatabase:
         return batches
 
     def get_batch(self, batch_id: str) -> Optional[Dict]:
-        """Get a specific batch by ID"""
+        """
+        Get a specific batch by ID
+
+        Args:
+            batch_id: The batch ID to retrieve (format: YYYYMMDD-NNN)
+
+        Returns:
+            Batch data dictionary or None if not found
+
+        Raises:
+            ValidationError: If batch_id format is invalid
+        """
+        # Validate batch ID format
+        batch_id = validate_batch_id(batch_id)
+
         for batch in self.get_all_batches():
             if batch.get('batch_id') == batch_id:
                 return batch

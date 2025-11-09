@@ -27,4 +27,34 @@ build-backend = "hatchling.build"
 packages = ["aiwynns"]
 
 [dependency-groups]
-dev = []
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=aiwynns",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--strict-markers",
+    "-v"
+]
+
+[tool.coverage.run]
+source = ["aiwynns"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

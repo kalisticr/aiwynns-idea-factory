@@ -4,6 +4,12 @@ Search module with fuzzy matching and advanced filtering
 
 from typing import List, Dict, Optional
 from rapidfuzz import fuzz, process
+from .validation import (
+    sanitize_search_query,
+    validate_limit,
+    validate_string,
+    ValidationError
+)
 
 
 class SearchEngine:
@@ -31,7 +37,22 @@ class SearchEngine:
             status: Filter by status
             fuzzy: Use fuzzy string matching
             limit: Maximum results to return
+
+        Raises:
+            ValidationError: If inputs are invalid
         """
+        # Validate inputs
+        query = sanitize_search_query(query)
+        limit = validate_limit(limit)
+
+        # Validate optional filters
+        if genre:
+            genre = validate_string(genre, "genre", max_length=100)
+        if trope:
+            trope = validate_string(trope, "trope", max_length=100)
+        if status:
+            status = validate_string(status, "status", max_length=50)
+
         results = []
 
         # Search batches

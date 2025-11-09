@@ -5,6 +5,12 @@ Creator module for generating new batches and stories from templates
 from pathlib import Path
 from datetime import datetime
 import re
+from .validation import (
+    validate_string,
+    validate_integer,
+    validate_slug,
+    ValidationError
+)
 
 
 class Creator:
@@ -34,7 +40,16 @@ class Creator:
 
         Returns:
             Path to created file
+
+        Raises:
+            ValidationError: If inputs are invalid
         """
+        # Validate inputs
+        genre = validate_string(genre, "genre", min_length=1, max_length=100)
+        tropes = validate_string(tropes, "tropes", min_length=1, max_length=500)
+        model = validate_string(model, "model", min_length=1, max_length=100)
+        count = validate_integer(count, "count", min_value=1, max_value=50)
+
         # Generate batch ID
         today = datetime.now().strftime("%Y%m%d")
         batch_num = 1
@@ -80,9 +95,23 @@ class Creator:
 
         Returns:
             Path to created file
+
+        Raises:
+            ValidationError: If inputs are invalid
         """
+        # Validate inputs
+        title = validate_string(title, "title", min_length=1, max_length=200)
+        genre = validate_string(genre, "genre", min_length=1, max_length=100)
+
         # Create filename from title
         filename = self._slugify(title)
+
+        # Validate the generated slug
+        if not filename:
+            raise ValidationError(
+                f"Title '{title}' produces an empty filename after slugification"
+            )
+
         new_file = self.stories_dir / f"{filename}.md"
 
         # Check if file exists
