@@ -12,8 +12,15 @@ from datetime import datetime, date
 
 from fastmcp import FastMCP
 
-# Get project root
-PROJECT_ROOT = Path(__file__).parent.parent
+# Get workspace root
+# When installed as package, use CWD (user's workspace)
+# When developing, use package parent directory
+if Path.cwd().name == "aiwynns-idea-factory":
+    # Development mode: running from repo
+    PROJECT_ROOT = Path(__file__).parent.parent
+else:
+    # Installed mode: use current working directory as workspace
+    PROJECT_ROOT = Path.cwd()
 
 # Import our modules
 from aiwynns.database import ConceptDatabase
