@@ -27,12 +27,20 @@ from aiwynns.database import ConceptDatabase
 from aiwynns.search import SearchEngine
 from aiwynns.stats import StatsGenerator
 from aiwynns.creator import Creator
+from aiwynns.logging_config import setup_logging
+import logging
+
+# Setup logging (DEBUG level for MCP server, logs to file if AIWYNNS_LOG_FILE env var is set)
+setup_logging(level=logging.DEBUG, console_output=False)
+logger = logging.getLogger(__name__)
 
 # Initialize
+logger.info(f"Initializing MCP server with workspace: {PROJECT_ROOT}")
 db = ConceptDatabase(PROJECT_ROOT)
 search_engine = SearchEngine(db)
 stats_gen = StatsGenerator(db)
 creator = Creator(PROJECT_ROOT)
+logger.info("MCP server initialized successfully")
 
 # Create MCP server
 mcp = FastMCP("Aiwynn's Idea Factory")

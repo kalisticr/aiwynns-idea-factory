@@ -30,6 +30,12 @@ from aiwynns.database import ConceptDatabase
 from aiwynns.search import SearchEngine
 from aiwynns.stats import StatsGenerator
 from aiwynns.creator import Creator
+from aiwynns.logging_config import setup_logging
+import logging
+
+# Setup logging (INFO level for CLI, logs to file if AIWYNNS_LOG_FILE env var is set)
+setup_logging(level=logging.INFO, console_output=False)
+logger = logging.getLogger(__name__)
 
 console = Console()
 db = ConceptDatabase(PROJECT_ROOT)

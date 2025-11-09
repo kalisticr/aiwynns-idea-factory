@@ -3,6 +3,7 @@ Search module with fuzzy matching and advanced filtering
 """
 
 from typing import List, Dict, Optional
+import logging
 from rapidfuzz import fuzz, process
 from .validation import (
     sanitize_search_query,
@@ -10,6 +11,8 @@ from .validation import (
     validate_string,
     ValidationError
 )
+
+logger = logging.getLogger(__name__)
 
 
 class SearchEngine:
@@ -52,6 +55,8 @@ class SearchEngine:
             trope = validate_string(trope, "trope", max_length=100)
         if status:
             status = validate_string(status, "status", max_length=50)
+
+        logger.info(f"Searching: query='{query}', fuzzy={fuzzy}, limit={limit}, genre={genre}, trope={trope}, status={status}")
 
         results = []
 
@@ -133,7 +138,11 @@ class SearchEngine:
         if fuzzy:
             results.sort(key=lambda x: x.get('score', 0), reverse=True)
 
-        return results[:limit]
+        limited_results = results[:limit]
+        logger.info(f"Search completed: found {len(results)} results, returning {len(limited_results)}")
+        logger.debug(f"Result types: {[r['type'] for r in limited_results]}")
+
+        return limited_results
 
     def _get_preview(self, text: str, query: str, context_chars: int = 100) -> str:
         """Get a preview of text around the query match"""

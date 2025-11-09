@@ -6,7 +6,10 @@ from pathlib import Path
 from typing import List, Dict, Optional
 import frontmatter
 import yaml
+import logging
 from .validation import validate_batch_id, ValidationError
+
+logger = logging.getLogger(__name__)
 
 
 class ConceptDatabase:
@@ -19,6 +22,7 @@ class ConceptDatabase:
 
     def get_all_batches(self) -> List[Dict]:
         """Get all concept batches from all subdirectories"""
+        logger.debug(f"Loading all batches from {self.concepts_dir}")
         batches = []
 
         for subdir in ['generated', 'developing', 'favorites']:
@@ -29,7 +33,9 @@ class ConceptDatabase:
                     if batch_data:
                         batch_data['location'] = subdir
                         batches.append(batch_data)
+                        logger.debug(f"Loaded batch: {batch_data.get('batch_id')}")
 
+        logger.info(f"Loaded {len(batches)} batches from {self.concepts_dir}")
         return batches
 
     def get_batch(self, batch_id: str) -> Optional[Dict]:
@@ -68,6 +74,7 @@ class ConceptDatabase:
     def _parse_batch_file(self, file_path: Path) -> Optional[Dict]:
         """Parse a batch markdown file with frontmatter"""
         try:
+            logger.debug(f"Parsing batch file: {file_path}")
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
 
@@ -78,27 +85,30 @@ class ConceptDatabase:
             # Extract concepts from content
             concepts = self._extract_concepts_from_content(post.content)
             metadata['concepts'] = concepts
+            logger.debug(f"Parsed batch file: {file_path.name} ({len(concepts)} concepts)")
 
             return metadata
 
         except Exception as e:
-            print(f"Error parsing {file_path}: {e}")
+            logger.error(f"Error parsing {file_path}: {e}", exc_info=True)
             return None
 
     def _parse_story_file(self, file_path: Path) -> Optional[Dict]:
         """Parse a story development markdown file"""
         try:
+            logger.debug(f"Parsing story file: {file_path}")
             with open(file_path, 'r', encoding='utf-8') as f:
                 post = frontmatter.load(f)
 
             metadata = dict(post.metadata)
             metadata['file_path'] = str(file_path)
             metadata['content'] = post.content
+            logger.debug(f"Parsed story file: {file_path.name}")
 
             return metadata
 
         except Exception as e:
-            print(f"Error parsing {file_path}: {e}")
+            logger.error(f"Error parsing {file_path}: {e}", exc_info=True)
             return None
 
     def _extract_concepts_from_content(self, content: str) -> List[Dict]:

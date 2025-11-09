@@ -5,12 +5,15 @@ Creator module for generating new batches and stories from templates
 from pathlib import Path
 from datetime import datetime
 import re
+import logging
 from .validation import (
     validate_string,
     validate_integer,
     validate_slug,
     ValidationError
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Creator:
@@ -50,6 +53,8 @@ class Creator:
         model = validate_string(model, "model", min_length=1, max_length=100)
         count = validate_integer(count, "count", min_value=1, max_value=50)
 
+        logger.info(f"Creating batch: genre={genre}, count={count}")
+
         # Generate batch ID
         today = datetime.now().strftime("%Y%m%d")
         batch_num = 1
@@ -59,9 +64,11 @@ class Creator:
 
         batch_id = f"{today}-{batch_num:03d}"
         new_file = self.concepts_dir / f"{batch_id}.md"
+        logger.debug(f"Generated batch ID: {batch_id}")
 
         # Read template
         template_file = self.templates_dir / "concept-batch.md"
+        logger.debug(f"Reading template: {template_file}")
         with open(template_file, 'r') as f:
             content = f.read()
 
@@ -74,9 +81,11 @@ class Creator:
         content = content.replace('"model used"', f'"{model}"')
 
         # Write file
+        logger.debug(f"Writing batch file: {new_file}")
         with open(new_file, 'w') as f:
             f.write(content)
 
+        logger.info(f"Created batch: {batch_id} at {new_file}")
         return new_file
 
     def create_story(
@@ -103,11 +112,14 @@ class Creator:
         title = validate_string(title, "title", min_length=1, max_length=200)
         genre = validate_string(genre, "genre", min_length=1, max_length=100)
 
+        logger.info(f"Creating story: title='{title}', genre={genre}")
+
         # Create filename from title
         filename = self._slugify(title)
 
         # Validate the generated slug
         if not filename:
+            logger.error(f"Title '{title}' produces empty filename after slugification")
             raise ValidationError(
                 f"Title '{title}' produces an empty filename after slugification"
             )
@@ -116,14 +128,17 @@ class Creator:
 
         # Check if file exists
         if new_file.exists():
+            logger.warning(f"Story file already exists: {new_file}, adding timestamp")
             timestamp = datetime.now().strftime("%Y%m%d")
             new_file = self.stories_dir / f"{filename}-{timestamp}.md"
 
         # Generate story ID
         story_id = f"{filename}-{int(datetime.now().timestamp())}"
+        logger.debug(f"Generated story ID: {story_id}")
 
         # Read template
         template_file = self.templates_dir / "story-development.md"
+        logger.debug(f"Reading template: {template_file}")
         with open(template_file, 'r') as f:
             content = f.read()
 
@@ -139,9 +154,11 @@ class Creator:
         content = content.replace("YYYY-MM-DD", datetime.now().strftime("%Y-%m-%d"))
 
         # Write file
+        logger.debug(f"Writing story file: {new_file}")
         with open(new_file, 'w') as f:
             f.write(content)
 
+        logger.info(f"Created story: {filename} at {new_file}")
         return new_file
 
     def _slugify(self, text: str) -> str:
