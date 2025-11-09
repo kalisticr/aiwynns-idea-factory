@@ -43,7 +43,7 @@ def cli():
 @click.option('--status', '-s', help='Filter by status')
 @click.option('--genre', '-g', help='Filter by genre')
 @click.option('--sort', '-S', type=click.Choice(['date', 'count', 'genre']), default='date')
-def list(status, genre, sort):
+def list_batches(status, genre, sort):
     """List all concept batches"""
     batches = db.get_all_batches()
 
@@ -86,6 +86,57 @@ def list(status, genre, sort):
 
     console.print(table)
     console.print(f"\n[dim]Total: {len(batches)} batches[/dim]")
+
+
+@cli.command()
+@click.option('--status', '-s', help='Filter by status')
+@click.option('--genre', '-g', help='Filter by genre')
+@click.option('--sort', '-S', type=click.Choice(['title', 'created', 'updated', 'genre']), default='updated')
+def list_stories(status, genre, sort):
+    """List all stories in development"""
+    stories = db.get_all_stories()
+
+    # Apply filters
+    if status:
+        stories = [s for s in stories if s.get('status') == status]
+    if genre:
+        stories = [s for s in stories if genre.lower() in str(s.get('genre', '')).lower()]
+
+    # Sort
+    if sort == 'title':
+        stories.sort(key=lambda x: str(x.get('title', '')))
+    elif sort == 'created':
+        stories.sort(key=lambda x: str(x.get('date_created', '')), reverse=True)
+    elif sort == 'updated':
+        stories.sort(key=lambda x: str(x.get('date_updated', '')), reverse=True)
+    elif sort == 'genre':
+        stories.sort(key=lambda x: str(x.get('genre', '')))
+
+    if not stories:
+        console.print("[yellow]No stories found.[/yellow]")
+        return
+
+    # Create table
+    table = Table(title="📖 Stories in Development", box=box.ROUNDED)
+    table.add_column("Title", style="cyan")
+    table.add_column("Genre", style="magenta")
+    table.add_column("Status", style="blue")
+    table.add_column("Origin", style="dim")
+    table.add_column("Created", style="green")
+    table.add_column("Updated", style="yellow")
+
+    for story in stories:
+        table.add_row(
+            str(story.get('title', 'N/A')),
+            str(story.get('genre', 'N/A')),
+            str(story.get('status', 'N/A')),
+            str(story.get('origin_batch', 'manual'))[:15],
+            str(story.get('date_created', 'N/A')),
+            str(story.get('date_updated', 'N/A'))
+        )
+
+    console.print(table)
+    console.print(f"\n[dim]Total: {len(stories)} stories[/dim]")
 
 
 @cli.command()
