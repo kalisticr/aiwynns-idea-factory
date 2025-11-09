@@ -1,0 +1,9 @@
+#!/bin/bash
+# Aiwynn's Idea Factory - Shell wrapper
+# Runs the aiwynns CLI using uv
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Run with uv
+exec uv run python -m aiwynns "$@"

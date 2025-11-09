@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# uv
+.uv/
+uv.lock
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+export-*.json
+export-*.csv
+export-*.yaml
+*.bak
+
+# Claude Code (keep config, ignore logs)
+.claude/logs/
+
+# ============================================================================
+# USER CONTENT (exclude from version control)
+# ============================================================================
+# The sections below separate application code (tracked) from user-generated
+# content (not tracked). This allows you to commit the framework while keeping
+# your personal stories and concepts private.
+
+# Generated concept batches
+concepts/generated/*.md
+concepts/developing/*.md
+concepts/favorites/*.md
+
+# Story development files
+stories/*.md
+
+# Content index and idea notes
+INDEX.md
+IDEA-BOX.md
+
+# Archive directory (old/experimental content)
+archive/

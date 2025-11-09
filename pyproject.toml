@@ -1,0 +1,30 @@
+[project]
+name = "aiwynns-idea-factory"
+version = "1.0.0"
+description = "A sophisticated system for managing AI-generated fiction novel ideas"
+requires-python = ">=3.12"
+dependencies = [
+    "rich>=13.7.0",
+    "click>=8.1.0",
+    "PyYAML>=6.0.1",
+    "python-frontmatter>=1.0.0",
+    "rapidfuzz>=3.5.0",
+    "thefuzz>=0.20.0",
+    "python-dateutil>=2.8.0",
+    "tabulate>=0.9.0",
+    "fastmcp>=0.2.0",
+]
+
+[project.scripts]
+idea-factory = "aiwynns.app:cli"
+idea-factory-mcp = "aiwynns.mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["aiwynns"]
+
+[dependency-groups]
+dev = []
